@@ -1,0 +1,61 @@
+:root {
+  --primary: #6C5CE7;
+  --primary-dark: #5A4BD1;
+  --primary-light: #a29bfe;
+  --primary-bg: rgba(108, 92, 231, 0.08);
+  --sidebar-bg: #0f172a;
+  --sidebar-hover: #1e293b;
+  --sidebar-active: rgba(108, 92, 231, 0.15);
+  --content-bg: #f8fafc;
+  --card-bg: #ffffff;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --border-color: #e2e8f0;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: var(--text-primary);
+  background: var(--content-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* Element Plus overrides */
+.el-button--primary {
+  --el-button-bg-color: var(--primary);
+  --el-button-border-color: var(--primary);
+  --el-button-hover-bg-color: var(--primary-dark);
+  --el-button-hover-border-color: var(--primary-dark);
+}
+.el-slider__bar { background-color: var(--primary); }
+.el-slider__button { border-color: var(--primary); }
+.el-progress__text { color: var(--primary) !important; }
+.el-switch.is-checked .el-switch__core { background-color: var(--primary); border-color: var(--primary); }
+.el-radio-button__original-radio:checked + .el-radio-button__inner {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  box-shadow: -1px 0 0 0 var(--primary);
+}
+.el-checkbox__input.is-checked .el-checkbox__inner {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+.el-checkbox__input.is-checked + .el-checkbox__label { color: var(--primary); }
+.el-input-number__increase:hover, .el-input-number__decrease:hover { color: var(--primary); }

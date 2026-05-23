@@ -1,0 +1,21 @@
+[project]
+name = "image-toolbox-backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.136.1",
+    "imagehash>=4.3.2",
+    "img2pdf>=0.6.3",
+    "opencv-python-headless>=4.13.0.92",
+    "pillow>=12.2.0",
+    "pycryptodome>=3.23.0",
+    "python-barcode>=0.16.1",
+    "python-multipart>=0.0.29",
+    "pyzbar>=0.1.9",
+    "qrcode>=8.2",
+    "rembg[cpu]>=2.0.75",
+    "scikit-learn>=1.8.0",
+    "uvicorn>=0.47.0",
+]
