@@ -14,7 +14,7 @@
       <el-input
         v-model="query"
         size="large"
-        placeholder="描述你想做什么，比如"把背景去掉"、"压缩图片大小"..."
+        placeholder='描述你想做什么，比如"把背景去掉"、"压缩图片大小"...'
         clearable
         @input="onInput"
         @clear="onClear"
