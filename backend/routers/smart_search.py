@@ -2,11 +2,16 @@
 import logging
 
 import numpy as np
-from fastapi import APIRouter, Request
+from pydantic import BaseModel, Field
+from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
+class SearchRequest(BaseModel):
+    query: str = ""
+    top_n: int = Field(default=5, ge=1, le=10)
+
 from services.tool_descriptions import TOOLS, CATEGORY_NAMES
-from services.embedding import get_embedding_service, EmbeddingService
+from services.embedding import build_vocabulary, encode, similarity
 
 logger = logging.getLogger(__name__)
 
@@ -18,14 +23,19 @@ _tool_metas: list[dict] = []
 _search_ready: bool = False
 
 
-def _build_tool_index(service: EmbeddingService):
+def _build_tool_index():
     """为 45 个工具预计算向量索引。"""
     global _tool_embeddings, _tool_metas, _search_ready
+
+    search_texts = [t[4] for t in TOOLS]
+
+    # 用所有工具描述构建 TF-IDF 词表
+    build_vocabulary(search_texts)
 
     embeddings = []
     metas = []
     for path, title, icon, cat_key, search_text in TOOLS:
-        vec = service.encode(search_text)
+        vec = encode(search_text)
         embeddings.append(vec)
         metas.append({
             "path": path,
@@ -35,7 +45,7 @@ def _build_tool_index(service: EmbeddingService):
             "description": search_text.split(" ")[0] if search_text else title,
         })
 
-    _tool_embeddings = np.stack(embeddings, axis=0)  # (45, 384)
+    _tool_embeddings = np.stack(embeddings, axis=0)  # (45, V)
     _tool_metas = metas
     _search_ready = True
     logger.info(f"工具索引构建完毕，共 {len(metas)} 个功能")
@@ -45,8 +55,7 @@ def _build_tool_index(service: EmbeddingService):
 def _on_startup():
     """应用启动时构建索引。失败则标记未就绪。"""
     try:
-        svc = get_embedding_service()
-        _build_tool_index(svc)
+        _build_tool_index()
     except Exception as e:
         logger.error(f"智能搜索索引构建失败: {e}")
         _search_ready = False
@@ -59,7 +68,7 @@ async def health():
 
 
 @router.post("")
-async def smart_search(request: Request):
+async def smart_search(req: SearchRequest):
     """搜索匹配的工具。"""
     if not _search_ready or _tool_embeddings is None:
         return JSONResponse(
@@ -67,9 +76,8 @@ async def smart_search(request: Request):
             status_code=503,
         )
 
-    body = await request.json()
-    query = (body.get("query") or "").strip()
-    top_n = min(body.get("top_n", 5), 10)
+    query = req.query.strip()
+    top_n = min(req.top_n, 10)
 
     if not query:
         return JSONResponse(
@@ -80,9 +88,7 @@ async def smart_search(request: Request):
     if len(query) > 200:
         query = query[:200]
 
-    # 编码查询
-    svc = get_embedding_service()
-    query_vec = svc.encode(query)  # (384,)
+    query_vec = encode(query)
 
     # 余弦相似度 = 归一化向量点积
     scores = np.dot(_tool_embeddings, query_vec)  # (45,)
@@ -93,7 +99,7 @@ async def smart_search(request: Request):
     results = []
     for idx in top_indices:
         score = float(scores[idx])
-        if score < 0.2:    # 相关性太低，截断
+        if score < 0.05:    # TF-IDF 分数较低，降低阈值
             break
         meta = _tool_metas[idx].copy()
         meta["score"] = round(score, 4)

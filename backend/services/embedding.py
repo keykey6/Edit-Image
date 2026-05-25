@@ -1,123 +1,100 @@
-"""文本嵌入服务。使用 paraphrase-multilingual-MiniLM-L12-v2 ONNX 模型做语义编码。"""
-import os
+"""文本嵌入服务。使用 jieba 分词 + TF-IDF 做中文语义匹配。
+无需下载模型，毫秒级响应，适合功能搜索场景。
+"""
 import logging
-from pathlib import Path
+from collections import Counter
+import math
+
 import numpy as np
-import onnxruntime as ort
-from huggingface_hub import hf_hub_download
-from tokenizers import Tokenizer
 
 logger = logging.getLogger(__name__)
 
-MODEL_REPO = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-MODEL_FILES = ["model.onnx", "tokenizer.json"]
-EMBEDDING_DIM = 384
-MAX_SEQ_LEN = 128
-
-DEFAULT_CACHE = Path.home() / ".cache" / "image-toolbox" / "models"
+# 全局 TF-IDF 词表，由 build_vocabulary() 构建
+_vocabulary: dict[str, int] = {}       # term -> index
+_idf: dict[str, float] = {}            # term -> idf weight
+_vocab_size: int = 0
 
 
-def _ensure_model_files() -> Path:
-    """确保模型文件存在。从 HuggingFace 下载或使用本地缓存。"""
-    cache_dir = Path(os.environ.get("MODEL_CACHE_DIR", str(DEFAULT_CACHE)))
-    cache_dir.mkdir(parents=True, exist_ok=True)
+def _tokenize(text: str) -> list[str]:
+    """中文分词 + 字符级 bigram 增强。"""
+    try:
+        import jieba
+        words = list(jieba.cut(text))
+    except ImportError:
+        words = list(text)
 
-    repo_hash = MODEL_REPO.replace("/", "--")
-    model_dir = cache_dir / repo_hash
+    terms = []
+    for w in words:
+        w = w.strip()
+        if not w:
+            continue
+        terms.append(w)
+        # 对中文词汇做字符 bigram 增强匹配
+        if len(w) >= 2 and any('一' <= c <= '鿿' for c in w):
+            for i in range(len(w) - 1):
+                terms.append(w[i:i + 2])
 
-    for fname in MODEL_FILES:
-        fpath = model_dir / fname
-        if not fpath.exists():
-            logger.info(f"下载模型文件: {fname}")
-            downloaded = hf_hub_download(
-                repo_id=MODEL_REPO,
-                filename=f"onnx/{fname}",
-                cache_dir=str(model_dir.parent),
-            )
-            import shutil
-            os.makedirs(os.path.dirname(fpath), exist_ok=True)
-            if not fpath.exists():
-                shutil.copy2(downloaded, fpath)
-
-    return model_dir
+    return terms
 
 
-class EmbeddingService:
-    """文本嵌入服务：编码文本为向量，计算相似度。"""
+def build_vocabulary(documents: list[str]):
+    """根据文档集合构建 TF-IDF 词表。"""
+    global _vocabulary, _idf, _vocab_size
 
-    def __init__(self):
-        self.session: ort.InferenceSession | None = None
-        self.tokenizer: Tokenizer | None = None
+    doc_count = len(documents)
+    doc_freq: Counter = Counter()
 
-    def initialize(self):
-        """加载模型和分词器。首次运行会下载模型文件。"""
-        model_dir = _ensure_model_files()
-        onnx_path = model_dir / "model.onnx"
-        tokenizer_path = model_dir / "tokenizer.json"
+    all_terms: list[list[str]] = []
+    for doc in documents:
+        terms = _tokenize(doc)
+        all_terms.append(terms)
+        doc_freq.update(set(terms))
 
-        if not onnx_path.exists() or not tokenizer_path.exists():
-            raise FileNotFoundError(
-                f"模型文件缺失。需要 {onnx_path} 和 {tokenizer_path}"
-            )
+    # 构建词表（按词频排序，取前 3000 个）
+    sorted_terms = sorted(doc_freq.items(), key=lambda x: -x[1])[:3000]
+    _vocabulary = {term: idx for idx, (term, _) in enumerate(sorted_terms)}
+    _vocab_size = len(_vocabulary)
 
-        self.session = ort.InferenceSession(
-            str(onnx_path),
-            providers=["CPUExecutionProvider"],
-        )
-        self.tokenizer = Tokenizer.from_file(str(tokenizer_path))
-        logger.info("嵌入模型加载完毕")
+    # 计算 IDF
+    for term, idx in _vocabulary.items():
+        df = doc_freq.get(term, 1)
+        _idf[term] = math.log((doc_count + 1) / (df + 1)) + 1.0
 
-    def encode(self, text: str) -> np.ndarray:
-        """编码文本为归一化嵌入向量 (384,)。"""
-        if not self.session or not self.tokenizer:
-            raise RuntimeError("模型未初始化")
-
-        encoded = self.tokenizer.encode(text)
-        ids = encoded.ids[:MAX_SEQ_LEN]
-        seq_len = len(ids)
-
-        input_ids = np.zeros((1, MAX_SEQ_LEN), dtype=np.int64)
-        attention_mask = np.zeros((1, MAX_SEQ_LEN), dtype=np.int64)
-        token_type_ids = np.zeros((1, MAX_SEQ_LEN), dtype=np.int64)
-
-        input_ids[0, :seq_len] = ids
-        attention_mask[0, :seq_len] = 1
-
-        outputs = self.session.run(
-            None,
-            {
-                "input_ids": input_ids,
-                "attention_mask": attention_mask,
-                "token_type_ids": token_type_ids,
-            },
-        )
-        # outputs[0] = last_hidden_state (1, seq_len, 384)
-        # Mean pooling over token dimension
-        hidden = outputs[0][0]                    # (seq_len, 384)
-        mask = attention_mask[0][:, None]          # (seq_len, 1)
-        masked = hidden * mask
-        summed = masked.sum(axis=0)                # (384,)
-        count = mask.sum()
-        embedding = summed / max(count, 1)        # (384,)
-
-        # L2 normalize
-        norm = np.linalg.norm(embedding)
-        if norm > 0:
-            embedding = embedding / norm
-        return embedding.astype(np.float32)
-
-    def similarity(self, a: np.ndarray, b: np.ndarray) -> float:
-        """余弦相似度（向量已归一化时等价于点积）。"""
-        return float(np.dot(a, b))
+    logger.info(f"TF-IDF 词表构建完毕，词数: {_vocab_size}")
 
 
-# 全局单例
-_embedding_service: EmbeddingService | None = None
+def _encode_sparse(terms: list[str]) -> np.ndarray:
+    """将分词结果编码为 TF-IDF 加权向量。"""
+    tf: Counter = Counter()
+    for t in terms:
+        if t in _vocabulary:
+            tf[t] += 1
+
+    vec = np.zeros(_vocab_size, dtype=np.float32)
+    if not tf:
+        return vec
+
+    # TF-IDF weighting
+    total = sum(tf.values())
+    for term, count in tf.items():
+        idx = _vocabulary[term]
+        vec[idx] = (count / total) * _idf.get(term, 1.0)
+
+    # L2 normalize
+    norm = np.linalg.norm(vec)
+    if norm > 0:
+        vec = vec / norm
+    return vec
 
 
-def get_embedding_service() -> EmbeddingService:
-    global _embedding_service
-    if _embedding_service is None:
-        _embedding_service = EmbeddingService()
-        _embedding_service.initialize()
-    return _embedding_service
+def encode(text: str) -> np.ndarray:
+    """编码文本为 TF-IDF 向量。"""
+    if not _vocabulary:
+        raise RuntimeError("词表未初始化，请先调用 build_vocabulary()")
+    terms = _tokenize(text)
+    return _encode_sparse(terms)
+
+
+def similarity(a: np.ndarray, b: np.ndarray) -> float:
+    """余弦相似度（向量已归一化时等价于点积）。"""
+    return float(np.dot(a, b))

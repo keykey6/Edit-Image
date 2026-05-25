@@ -20,4 +20,5 @@ dependencies = [
     "uvicorn>=0.47.0",
     "tokenizers>=0.22.0",
     "huggingface-hub>=0.30.0",
+    "jieba>=0.42.1",
 ]
