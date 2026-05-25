@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import HomePage from '@/views/HomePage.vue'
 
 export interface RouteMeta {
   title: string
@@ -103,7 +104,7 @@ export const ROUTES = [
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/', redirect: '/id-photo' },
+    { path: '/', name: 'Home', component: HomePage, meta: { title: '首页', icon: 'HomeFilled', category: '' } },
     ...ROUTES,
   ],
 })
