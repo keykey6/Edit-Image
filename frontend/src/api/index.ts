@@ -51,4 +51,23 @@ export async function processImagesZip({ module, files, params }: {
   return res.data
 }
 
+export interface SearchResult {
+  path: string
+  title: string
+  description: string
+  category: string
+  icon: string
+  score: number
+}
+
+export interface SearchResponse {
+  results: SearchResult[]
+  detail?: string
+}
+
+export async function smartSearch(query: string, topN = 5): Promise<SearchResponse> {
+  const res = await api.post('/smart-search', { query, top_n: topN })
+  return res.data
+}
+
 export default api
