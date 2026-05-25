@@ -52,7 +52,7 @@ export const ROUTES = [
 
   // ===== 滤镜特效 =====
   { path: '/sketch-effect', name: 'SketchEffect', component: () => import('@/views/SketchEffect.vue'), meta: { title: '素描漫画', icon: 'Brush', category: 'effects' } },
-  { path: '/shadow', name: 'Shadow', component: () => import('@/views/Shadow.vue'), meta: { title: '阴影倒影', icon: 'PictureFilled', category: 'effects' } },
+  { path: '/shadow', name: 'Shadow', component: () => import('@/views/Shadow.vue'), meta: { title: '阴影倒影', icon: 'Picture', category: 'effects' } },
   { path: '/perspective', name: 'Perspective', component: () => import('@/views/Perspective.vue'), meta: { title: '透视矫正', icon: 'Crop', category: 'effects' } },
 
   // ===== 人像处理 =====
@@ -67,7 +67,7 @@ export const ROUTES = [
   { path: '/watermark-add', name: 'WatermarkAdd', component: () => import('@/views/WatermarkAdd.vue'), meta: { title: '水印添加', icon: 'Edit', category: 'privacy' } },
   { path: '/watermark-remove', name: 'WatermarkRemove', component: () => import('@/views/WatermarkRemove.vue'), meta: { title: '水印去除', icon: 'Delete', category: 'privacy' } },
   { path: '/blur-mosaic', name: 'BlurMosaic', component: () => import('@/views/BlurMosaic.vue'), meta: { title: '模糊打码', icon: 'Hide', category: 'privacy' } },
-  { path: '/privacy-erase', name: 'PrivacyErase', component: () => import('@/views/PrivacyErase.vue'), meta: { title: '隐私擦除', icon: 'RemoveFilled', category: 'privacy' } },
+  { path: '/privacy-erase', name: 'PrivacyErase', component: () => import('@/views/PrivacyErase.vue'), meta: { title: '隐私擦除', icon: 'Remove', category: 'privacy' } },
   { path: '/encrypt', name: 'Encrypt', component: () => import('@/views/Encrypt.vue'), meta: { title: '图片加密', icon: 'Lock', category: 'privacy' } },
 
   // ===== 拼图排版 =====
@@ -79,20 +79,20 @@ export const ROUTES = [
   // ===== 格式转换 =====
   { path: '/super-res', name: 'SuperRes', component: () => import('@/views/SuperRes.vue'), meta: { title: '分辨率放大', icon: 'ZoomIn', category: 'convert' } },
   { path: '/to-pdf', name: 'ToPdf', component: () => import('@/views/ToPdf.vue'), meta: { title: '图片转PDF', icon: 'Document', category: 'convert' } },
-  { path: '/to-ico', name: 'ToIco', component: () => import('@/views/ToIco.vue'), meta: { title: '图片转ICO', icon: 'StarFilled', category: 'convert' } },
+  { path: '/to-ico', name: 'ToIco', component: () => import('@/views/ToIco.vue'), meta: { title: '图片转ICO', icon: 'Star', category: 'convert' } },
 
   // ===== 生成与解码 =====
   { path: '/qrcode-gen', name: 'QrcodeGen', component: () => import('@/views/QrcodeGen.vue'), meta: { title: '二维码生成', icon: 'Postcard', category: 'generate' } },
   { path: '/qr-decode', name: 'QrDecode', component: () => import('@/views/QrDecode.vue'), meta: { title: '二维码解码', icon: 'View', category: 'generate' } },
-  { path: '/barcode', name: 'Barcode', component: () => import('@/views/Barcode.vue'), meta: { title: '条形码生成', icon: 'Barcode', category: 'generate' } },
+  { path: '/barcode', name: 'Barcode', component: () => import('@/views/Barcode.vue'), meta: { title: '条形码生成', icon: 'Tickets', category: 'generate' } },
   { path: '/text-to-image', name: 'TextToImage', component: () => import('@/views/TextToImage.vue'), meta: { title: '文字转图片', icon: 'EditPen', category: 'generate' } },
-  { path: '/meme', name: 'Meme', component: () => import('@/views/Meme.vue'), meta: { title: '表情包制作', icon: 'Smile', category: 'generate' } },
+  { path: '/meme', name: 'Meme', component: () => import('@/views/Meme.vue'), meta: { title: '表情包制作', icon: 'ChatLineSquare', category: 'generate' } },
 
   // ===== 智能分析 =====
   { path: '/similarity', name: 'Similarity', component: () => import('@/views/Similarity.vue'), meta: { title: '相似度对比', icon: 'Link', category: 'analysis' } },
   { path: '/duplicate', name: 'Duplicate', component: () => import('@/views/Duplicate.vue'), meta: { title: '重复检测', icon: 'CopyDocument', category: 'analysis' } },
   { path: '/quality-score', name: 'QualityScore', component: () => import('@/views/QualityScore.vue'), meta: { title: '质量评分', icon: 'Medal', category: 'analysis' } },
-  { path: '/color-picker', name: 'ColorPicker', component: () => import('@/views/ColorPickerView.vue'), meta: { title: '取色器', icon: 'ColorPicker', category: 'analysis' } },
+  { path: '/color-picker', name: 'ColorPicker', component: () => import('@/views/ColorPickerView.vue'), meta: { title: '取色器', icon: 'Brush', category: 'analysis' } },
 
   // ===== 批量与预设 =====
   { path: '/batch-process', name: 'BatchProcess', component: () => import('@/views/BatchProcess.vue'), meta: { title: '批量处理', icon: 'List', category: 'batch' } },

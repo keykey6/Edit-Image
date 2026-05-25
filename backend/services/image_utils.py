@@ -1,10 +1,14 @@
 import os
 import json
 import uuid
-from fastapi import Form, UploadFile
+import logging
+from fastapi import Form, UploadFile, HTTPException
 from fastapi.responses import FileResponse
+from starlette.background import BackgroundTask
 from PIL import Image
 from config import UPLOAD_DIR
+
+logger = logging.getLogger(__name__)
 
 
 def parse_params(params_str: str | None = Form(None)) -> dict:
@@ -17,13 +21,23 @@ def parse_params(params_str: str | None = Form(None)) -> dict:
     return {}
 
 
-def save_upload(file: UploadFile) -> tuple[str, str]:
+def save_upload(file: UploadFile, moderate_content: bool = True) -> tuple[str, str]:
+    """Save uploaded file to disk. If moderate_content is True, run content safety check."""
     file_id = uuid.uuid4().hex
     ext = os.path.splitext(file.filename or ".png")[1].lower() or ".png"
     filename = f"{file_id}{ext}"
     filepath = os.path.join(UPLOAD_DIR, filename)
     with open(filepath, "wb") as f:
         f.write(file.file.read())
+
+    if moderate_content:
+        from services.content_moderation import moderate
+        result = moderate(filepath)
+        if not result.passed:
+            os.remove(filepath)
+            logger.warning(f"内容审核拦截: {file.filename} — {result.reason}")
+            raise HTTPException(status_code=400, detail=result.reason)
+
     return filepath, file_id
 
 
@@ -54,9 +68,10 @@ def cleanup_temp(filepath: str):
 
 def image_response(path: str, filename: str = "result.png", cleanup_after: bool = False) -> FileResponse:
     """Return FileResponse with proper headers. If cleanup_after, schedule cleanup after response."""
+    background = BackgroundTask(cleanup_temp, path) if cleanup_after else None
     return FileResponse(
         path,
         media_type="image/png",
         filename=filename,
-        background=None if not cleanup_after else None,
+        background=background,
     )

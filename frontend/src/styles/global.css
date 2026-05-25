@@ -1,11 +1,13 @@
 :root {
-  --primary: #6C5CE7;
-  --primary-dark: #5A4BD1;
-  --primary-light: #a29bfe;
-  --primary-bg: rgba(108, 92, 231, 0.08);
-  --sidebar-bg: #0f172a;
-  --sidebar-hover: #1e293b;
-  --sidebar-active: rgba(108, 92, 231, 0.15);
+  --primary: #7C3AED;
+  --primary-dark: #6D28D9;
+  --primary-light: #A78BFA;
+  --primary-bg: rgba(124, 58, 237, 0.08);
+  --sidebar-bg: #0F172A;
+  --sidebar-hover: #1E293B;
+  --sidebar-active: rgba(124, 58, 237, 0.12);
+  --sidebar-text: #94A3B8;
+  --sidebar-text-active: #FFFFFF;
   --content-bg: #f8fafc;
   --card-bg: #ffffff;
   --text-primary: #1e293b;
@@ -28,7 +30,7 @@
 body {
   font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   color: var(--text-primary);
-  background: var(--content-bg);
+  background: #FFFFFF;
   -webkit-font-smoothing: antialiased;
 }
 

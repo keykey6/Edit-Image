@@ -6,16 +6,17 @@ from pydantic import BaseModel, Field
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
-class SearchRequest(BaseModel):
-    query: str = ""
-    top_n: int = Field(default=5, ge=1, le=10)
-
 from services.tool_descriptions import TOOLS, CATEGORY_NAMES
-from services.embedding import build_vocabulary, encode, similarity
+from services.embedding import build_vocabulary, encode
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/smart-search", tags=["智能搜索"])
+
+
+class SearchRequest(BaseModel):
+    query: str = ""
+    top_n: int = Field(default=5, ge=1, le=10)
 
 # 预计算存储：工具向量 + 工具元数据
 _tool_embeddings: np.ndarray | None = None

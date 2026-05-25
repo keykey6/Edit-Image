@@ -34,7 +34,7 @@ TOOLS: list[tuple[str, str, str, str, str]] = [
     # ===== 艺术效果 =====
     ("/sketch-effect", "素描漫画", "Brush", "effects",
      "素描漫画 照片变素描 铅笔素描 漫画效果 卡通化 手绘风格 线稿效果 艺术化 照片转手绘"),
-    ("/shadow", "阴影倒影", "PictureFilled", "effects",
+    ("/shadow", "阴影倒影", "Picture", "effects",
      "阴影倒影 添加阴影 倒影效果 镜面倒影 立体阴影 产品展示 图片立体感 投影"),
     ("/perspective", "透视矫正", "Crop", "effects",
      "透视矫正 梯形校正 文档扫描矫正 图片拉直 变形校正 建筑摄影矫正 手机拍文档"),
@@ -60,7 +60,7 @@ TOOLS: list[tuple[str, str, str, str, str]] = [
      "水印去除 去水印 消除水印 删除水印 移除水印 去除LOGO 去掉水印 除水印"),
     ("/blur-mosaic", "模糊打码", "Hide", "privacy",
      "模糊打码 马赛克 打码 模糊人脸 遮挡敏感信息 车牌打码 高斯模糊 身份信息打码 隐私保护"),
-    ("/privacy-erase", "隐私擦除", "RemoveFilled", "privacy",
+    ("/privacy-erase", "隐私擦除", "Remove", "privacy",
      "隐私擦除 删除EXIF 清除图片信息 去除拍摄数据 隐私保护 抹除GPS位置 清除相机信息"),
     ("/encrypt", "图片加密", "Lock", "privacy",
      "图片加密 照片加密 密码保护 隐私照片 文件加密 AES加密 图片加锁 加密图片"),
@@ -80,7 +80,7 @@ TOOLS: list[tuple[str, str, str, str, str]] = [
      "分辨率放大 提高分辨率 图片放大 增加像素 放大清晰度 图片无损放大 超分辨率 图片变清晰"),
     ("/to-pdf", "图片转PDF", "Document", "convert",
      "图片转PDF 图片合并PDF 多图转一个PDF PDF导出 图片转文档 生成PDF文件 照片转PDF"),
-    ("/to-ico", "图片转ICO", "StarFilled", "convert",
+    ("/to-ico", "图片转ICO", "Star", "convert",
      "图片转ICO 制作图标 网站图标 应用图标 图标制作 favicon 小图标 多尺寸图标"),
 
     # ===== 生成与识别 =====
@@ -88,11 +88,11 @@ TOOLS: list[tuple[str, str, str, str, str]] = [
      "二维码生成 制作二维码 生成二维码 URL二维码 文本二维码 WiFi二维码 收款码 名片二维码"),
     ("/qr-decode", "二维码解码", "View", "generate",
      "二维码解码 识别二维码 扫描二维码 读取二维码内容 解析二维码 扫码 翻译二维码"),
-    ("/barcode", "条形码生成", "Barcode", "generate",
+    ("/barcode", "条形码生成", "Tickets", "generate",
      "条形码生成 条形码 商品条码 ISBN条码 条码制作 生成条码 商品编码"),
     ("/text-to-image", "文字转图片", "EditPen", "generate",
      "文字转图片 文本生成图片 文字排版 生成文字海报 长文截图 文字卡片 名言卡片 文字图片化"),
-    ("/meme", "表情包制作", "Smile", "generate",
+    ("/meme", "表情包制作", "ChatLineSquare", "generate",
      "表情包制作 搞笑图片 配文字表情包 做表情包 梗图 表情包DIY 给图片加搞笑文字 制作表情"),
 
     # ===== 智能分析 =====
@@ -102,7 +102,7 @@ TOOLS: list[tuple[str, str, str, str, str]] = [
      "重复检测 查找重复图片 批量查重 相似图片查找 找出重复 去重 找相同图片 清除重复照片"),
     ("/quality-score", "质量评分", "Medal", "analysis",
      "质量评分 图片质量 清晰度评分 画质评分 照片质量评估 模糊检测 噪点评分 图片好坏评分"),
-    ("/color-picker", "取色器", "ColorPicker", "analysis",
+    ("/color-picker", "取色器", "Brush", "analysis",
      "取色器 颜色提取 取色 吸管工具 像素颜色 区域颜色 获取颜色值 HEX RGB 色号"),
 
     # ===== 批量与预设 =====

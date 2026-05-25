@@ -81,4 +81,4 @@ for r in routers:
 
 @app.get("/")
 async def root():
-    return {"message": "超级全能图像工具箱 API", "version": "1.0.0"}
+    return {"message": "超级全能图像工具箱 API", "version": "2.0.0"}
