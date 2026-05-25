@@ -9,6 +9,10 @@
       </router-link>
 
       <nav class="sidebar-nav">
+        <router-link to="/" class="nav-item nav-home" active-class="nav-active" exact-active-class="nav-active">
+          <el-icon :size="16"><HomeFilled /></el-icon>
+          <span>首页</span>
+        </router-link>
         <div v-for="cat in categories" :key="cat.key" class="nav-group">
           <button class="group-label" @click="toggleCat(cat.key)">
             <span class="group-dot" />
