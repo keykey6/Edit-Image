@@ -47,6 +47,7 @@ from routers.meme import router as meme
 from routers.batch_rename import router as batch_rename
 from routers.batch_resize import router as batch_resize
 from routers.preset_save import router as preset_save
+from routers.smart_search import router as smart_search
 
 app = FastAPI(title="超级全能图像工具箱 API", version="2.0.0")
 
@@ -71,6 +72,7 @@ routers = [
     histogram, color_analysis, similarity, duplicate, quality_score,
     qr_decode, barcode, text_to_image, color_picker, meme,
     batch_rename, batch_resize, preset_save,
+    smart_search,
 ]
 
 for r in routers:
