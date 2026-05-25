@@ -18,4 +18,6 @@ dependencies = [
     "rembg[cpu]>=2.0.75",
     "scikit-learn>=1.8.0",
     "uvicorn>=0.47.0",
+    "tokenizers>=0.22.0",
+    "huggingface-hub>=0.30.0",
 ]
