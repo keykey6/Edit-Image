@@ -1,25 +1,47 @@
-# Python
+# ===== Python =====
 __pycache__/
 *.py[cod]
 *.egg-info/
 .venv/
+venv/
+*.whl
 
-# Node
+# ===== Node / Frontend =====
 node_modules/
 dist/
 dist-ssr/
 *.local
+.vite/
 
-# IDE
+# ===== Environment & Secrets =====
+.env
+.env.*
+!.env.example
+
+# ===== IDE =====
 .vscode/*
 !.vscode/extensions.json
 .idea/
-*.sw?
+*.swp
+*.swo
+*~
 
-# OS
+# ===== OS =====
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# Upload temp files
+# ===== Uploads (temp files) =====
 backend/uploads/*
 !backend/uploads/.gitkeep
+
+# ===== Logs =====
+*.log
+logs/
+
+# ===== Docker =====
+docker-compose.override.yml
+
+# ===== Misc =====
+*.tmp
+.cache/
