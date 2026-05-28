@@ -32,17 +32,27 @@ def enhance_contrast(img: np.ndarray) -> np.ndarray:
 def auto_white_balance(img: np.ndarray) -> np.ndarray:
     lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
     l, a, b = cv2.split(lab)
-    a = cv2.addWeighted(a, 1.0, np.full_like(a, 128), -0.15, 0)
-    b = cv2.addWeighted(b, 1.0, np.full_like(b, 128), -0.15, 0)
+    a_mean, b_mean = float(np.mean(a)), float(np.mean(b))
+    a_shift = 128.0 - a_mean
+    b_shift = 128.0 - b_mean
+    a = np.clip(a.astype(np.float32) + a_shift, 0, 255).astype(np.uint8)
+    b = np.clip(b.astype(np.float32) + b_shift, 0, 255).astype(np.uint8)
     return cv2.cvtColor(cv2.merge([l, a, b]), cv2.COLOR_LAB2BGR)
 
 
 def remove_scratches(img: np.ndarray) -> np.ndarray:
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    edges = cv2.Canny(gray, 30, 100)
-    kernel = np.ones((3, 3), np.uint8)
-    mask = cv2.dilate(edges, kernel, iterations=1)
-    return cv2.inpaint(img, mask, 3, cv2.INPAINT_TELEA)
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+    # dark scratches (darker than surroundings): closing removes them, subtract to reveal
+    closed = cv2.morphologyEx(gray, cv2.MORPH_CLOSE, kernel)
+    dark = cv2.subtract(closed, gray)
+    # bright scratches (brighter than surroundings): opening removes them, subtract to reveal
+    opened = cv2.morphologyEx(gray, cv2.MORPH_OPEN, kernel)
+    bright = cv2.subtract(gray, opened)
+    combined = cv2.add(dark, bright)
+    _, scratch_mask = cv2.threshold(combined, 25, 255, cv2.THRESH_BINARY)
+    scratch_mask = cv2.dilate(scratch_mask, np.ones((3, 3), np.uint8), iterations=1)
+    return cv2.inpaint(img, scratch_mask, 3, cv2.INPAINT_TELEA)
 
 
 def color_correct(img: np.ndarray) -> np.ndarray:
@@ -71,17 +81,17 @@ async def process(
             pil_img = Image.open(filepath).convert("RGB")
             img = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
 
-        img = color_correct(img)
-        img = enhance_contrast(img)
+        if fix_scratches:
+            img = remove_scratches(img)
 
         if denoise_strength > 0:
             img = denoise(img, denoise_strength)
 
+        img = color_correct(img)
+        img = enhance_contrast(img)
+
         if correct_color:
             img = auto_white_balance(img)
-
-        if fix_scratches:
-            img = remove_scratches(img)
 
         op = _out_path(file_id)
         Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB)).save(op, "PNG")
