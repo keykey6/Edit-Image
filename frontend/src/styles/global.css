@@ -1,24 +1,55 @@
 :root {
-  --primary: #7C3AED;
-  --primary-dark: #6D28D9;
-  --primary-light: #A78BFA;
-  --primary-bg: rgba(124, 58, 237, 0.08);
-  --sidebar-bg: #0F172A;
-  --sidebar-hover: #1E293B;
-  --sidebar-active: rgba(124, 58, 237, 0.12);
-  --sidebar-text: #94A3B8;
-  --sidebar-text-active: #FFFFFF;
-  --content-bg: #f8fafc;
-  --card-bg: #ffffff;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --text-muted: #94a3b8;
-  --border-color: #e2e8f0;
-  --radius: 14px;
-  --radius-sm: 8px;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  /* ===== 核心色彩系统：柔和紫雾调 ===== */
+  --primary: #7B61FF;
+  --primary-dark: #6344F5;
+  --primary-light: #9B87FD;
+  --primary-bg: rgba(123, 97, 255, 0.08);
+  --primary-glow: rgba(123, 97, 255, 0.25);
+
+  /* 背景层次 */
+  --bg-base: #F3F0FF;
+  --bg-surface: rgba(255, 255, 255, 0.72);
+  --bg-surface-solid: #FFFFFF;
+  --bg-elevated: rgba(255, 255, 255, 0.88);
+  --bg-sidebar: rgba(255, 255, 255, 0.65);
+  --bg-sidebar-active: rgba(123, 97, 255, 0.12);
+
+  /* 文字色彩 */
+  --text-primary: #1A1528;
+  --text-secondary: #4A4460;
+  --text-muted: #8A8498;
+  --text-placeholder: #B5B0C4;
+
+  /* 边框与分割线 */
+  --border-color: rgba(200, 190, 230, 0.5);
+  --border-light: rgba(220, 215, 240, 0.4);
+  --divider: rgba(200, 190, 230, 0.35);
+
+  /* 阴影系统：柔和弥散 */
+  --shadow-sm: 0 1px 2px rgba(123, 97, 255, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow: 0 4px 16px rgba(123, 97, 255, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 8px 32px rgba(123, 97, 255, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 16px 48px rgba(123, 97, 255, 0.14), 0 8px 20px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 0 40px rgba(123, 97, 255, 0.15);
+
+  /* 圆角系统 */
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+
+  /* 动效 */
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* 玻璃拟态 */
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-blur: blur(20px) saturate(1.4);
+  --glass-blur-heavy: blur(40px) saturate(1.6);
 }
 
 * {
@@ -27,37 +58,80 @@
   box-sizing: border-box;
 }
 
-body {
-  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  color: var(--text-primary);
-  background: #FFFFFF;
-  -webkit-font-smoothing: antialiased;
+html {
+  scroll-behavior: smooth;
 }
 
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+body {
+  font-family: 'DM Sans', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: var(--text-primary);
+  background: var(--bg-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-/* Element Plus overrides */
+/* 滚动条美化 */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(123, 97, 255, 0.2); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(123, 97, 255, 0.35); }
+
+/* ===== Element Plus 主题覆盖 ===== */
 .el-button--primary {
   --el-button-bg-color: var(--primary);
   --el-button-border-color: var(--primary);
   --el-button-hover-bg-color: var(--primary-dark);
   --el-button-hover-border-color: var(--primary-dark);
+  --el-button-active-bg-color: #5238E0;
+  --el-button-active-border-color: #5238E0;
 }
+
 .el-slider__bar { background-color: var(--primary); }
 .el-slider__button { border-color: var(--primary); }
 .el-progress__text { color: var(--primary) !important; }
 .el-switch.is-checked .el-switch__core { background-color: var(--primary); border-color: var(--primary); }
+
 .el-radio-button__original-radio:checked + .el-radio-button__inner {
   background-color: var(--primary);
   border-color: var(--primary);
   box-shadow: -1px 0 0 0 var(--primary);
 }
+
 .el-checkbox__input.is-checked .el-checkbox__inner {
   background-color: var(--primary);
   border-color: var(--primary);
 }
 .el-checkbox__input.is-checked + .el-checkbox__label { color: var(--primary); }
+
 .el-input-number__increase:hover, .el-input-number__decrease:hover { color: var(--primary); }
+
+/* 输入框聚焦效果 */
+.el-input__wrapper.is-focus,
+.el-textarea__inner:focus {
+  box-shadow: 0 0 0 3px rgba(123, 97, 255, 0.12) !important;
+}
+
+/* ===== 通用工具类 ===== */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-heavy {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur-heavy);
+  -webkit-backdrop-filter: var(--glass-blur-heavy);
+  border: 1px solid var(--glass-border);
+}
+
+/* 全局背景装饰 */
+.bg-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+}

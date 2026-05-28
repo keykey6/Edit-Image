@@ -9,52 +9,58 @@
         <slot name="params" />
       </div>
       <div class="bar-action">
-        <el-button
-          type="primary"
-          size="large"
-          round
-          :loading="processing"
+        <button
+          class="btn-primary"
+          :disabled="processing"
           @click="handleProcess"
         >
-          <el-icon v-if="!processing"><MagicStick /></el-icon>
+          <el-icon v-if="!processing" :size="18"><MagicStick /></el-icon>
+          <span v-else class="btn-spinner" />
           {{ processing ? '处理中…' : '开始处理' }}
-        </el-button>
+        </button>
       </div>
     </div>
 
     <div v-if="file && !$slots.params" class="tool-action-only">
-      <el-button
-        type="primary"
-        size="large"
-        round
-        :loading="processing"
+      <button
+        class="btn-primary"
+        :disabled="processing"
         @click="handleProcess"
       >
-        <el-icon v-if="!processing"><MagicStick /></el-icon>
+        <el-icon v-if="!processing" :size="18"><MagicStick /></el-icon>
+        <span v-else class="btn-spinner" />
         {{ processing ? '处理中…' : '开始处理' }}
-      </el-button>
+      </button>
     </div>
 
     <div v-if="processing" class="tool-progress">
-      <el-progress :percentage="progressPct" :stroke-width="4" :show-text="false" />
+      <div class="progress-track">
+        <div class="progress-fill" :style="{ width: progressPct + '%' }" />
+      </div>
       <p class="progress-hint">正在处理图片，请稍候…</p>
     </div>
 
     <div v-if="errorMsg" class="tool-error">
-      <el-alert :title="errorMsg" type="error" show-icon closable @close="errorMsg = ''" />
+      <div class="error-glass">
+        <el-icon :size="18" class="error-icon"><WarningFilled /></el-icon>
+        <span>{{ errorMsg }}</span>
+        <button class="error-close" @click="errorMsg = ''">
+          <el-icon :size="14"><Close /></el-icon>
+        </button>
+      </div>
     </div>
 
     <div v-if="!processing && originalUrl && resultUrl" class="tool-result">
       <ImageCompare :original="originalUrl" :processed="resultUrl" />
       <div class="result-actions">
-        <el-button type="primary" size="large" round @click="handleDownload">
-          <el-icon><Download /></el-icon>
+        <button class="btn-primary" @click="handleDownload">
+          <el-icon :size="16"><Download /></el-icon>
           下载结果
-        </el-button>
-        <el-button size="large" round @click="handleReset">
-          <el-icon><Refresh /></el-icon>
+        </button>
+        <button class="btn-secondary" @click="handleReset">
+          <el-icon :size="16"><Refresh /></el-icon>
           重新处理
-        </el-button>
+        </button>
       </div>
     </div>
   </div>
@@ -156,37 +162,148 @@ function handleReset() {
 
 /* Toolbar for params + action */
 .tool-bar {
-  background: var(--card-bg);
-  border-radius: var(--radius);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
-  padding: 20px 24px;
+  padding: 24px;
   margin-bottom: 24px;
 }
 .bar-params {
-  margin-bottom: 18px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--divider);
 }
 .bar-action { text-align: center; }
 
 /* Action only (no params slot) */
 .tool-action-only { text-align: center; margin-bottom: 24px; }
 
+/* Buttons */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition);
+  box-shadow: 0 4px 16px rgba(123, 97, 255, 0.35);
+}
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(123, 97, 255, 0.45);
+}
+.btn-primary:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.btn-secondary:hover {
+  border-color: var(--primary-light);
+  color: var(--primary);
+  background: rgba(123, 97, 255, 0.06);
+}
+
+.btn-spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Progress */
 .tool-progress { margin-bottom: 24px; }
+.progress-track {
+  height: 4px;
+  background: var(--border-light);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+}
 .progress-hint {
-  margin-top: 8px;
+  margin-top: 10px;
   font-size: 13px;
   color: var(--text-muted);
   text-align: center;
 }
 
+/* Error */
 .tool-error { margin-bottom: 24px; }
+.error-glass {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  background: rgba(239, 68, 68, 0.08);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--radius);
+  color: #DC2626;
+  font-size: 13px;
+  font-weight: 500;
+}
+.error-icon { flex-shrink: 0; }
+.error-close {
+  margin-left: auto;
+  width: 24px; height: 24px;
+  border: none;
+  background: none;
+  color: #DC2626;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast);
+}
+.error-close:hover { background: rgba(239, 68, 68, 0.1); }
 
+/* Result */
 .tool-result { margin-top: 8px; }
 .result-actions {
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin-top: 24px;
+  margin-top: 28px;
 }
 </style>

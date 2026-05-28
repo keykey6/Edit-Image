@@ -105,6 +105,7 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/', name: 'Home', component: HomePage, meta: { title: '首页', icon: 'HomeFilled', category: '' } },
+    { path: '/all-tools', name: 'AllTools', component: () => import('@/views/AllTools.vue'), meta: { title: '全部工具', icon: 'Grid', category: '' } },
     ...ROUTES,
   ],
 })

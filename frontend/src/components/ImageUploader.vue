@@ -18,8 +18,10 @@
     />
     <div class="uploader-inner" @click="inputRef?.click()">
       <template v-if="!modelValue">
-        <div class="upload-icon-wrap">
-          <el-icon class="upload-icon" :size="36"><UploadFilled /></el-icon>
+        <div class="upload-glow">
+          <div class="upload-icon-wrap">
+            <el-icon class="upload-icon" :size="32"><UploadFilled /></el-icon>
+          </div>
         </div>
         <p class="upload-text">拖拽图片到此处，或 <span>点击上传</span></p>
         <p class="upload-hint">
@@ -30,14 +32,16 @@
         <div class="preview-area">
           <img v-if="previewUrl" :src="previewUrl" alt="preview" />
           <div class="preview-overlay">
-            <el-icon :size="20"><Refresh /></el-icon>
+            <div class="overlay-icon">
+              <el-icon :size="20"><Refresh /></el-icon>
+            </div>
             <span>点击更换图片</span>
           </div>
         </div>
       </template>
     </div>
     <button v-if="modelValue" class="clear-btn" @click.stop="clearFile" title="移除">
-      <el-icon :size="16"><Close /></el-icon>
+      <el-icon :size="14"><Close /></el-icon>
     </button>
   </div>
 </template>
@@ -96,57 +100,91 @@ function clearFile() {
 .uploader {
   position: relative;
   border: 2px dashed var(--border-color);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   cursor: pointer;
-  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  transition: all var(--transition);
   outline: none;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
 }
-.uploader:focus-visible { border-color: var(--primary-light); }
+.uploader:focus-visible {
+  border-color: var(--primary-light);
+}
 .uploader:hover, .uploader.is-dragover {
   border-color: var(--primary);
-  background: var(--primary-bg);
+  background: rgba(123, 97, 255, 0.04);
+  box-shadow: 0 0 0 4px rgba(123, 97, 255, 0.08), var(--shadow);
 }
 .uploader.is-dragover {
   border-style: solid;
-  box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.12);
 }
 .uploader.has-file {
   border-style: solid;
   border-color: var(--border-color);
   padding: 0;
+  background: transparent;
+  backdrop-filter: none;
 }
 
-.uploader-inner { padding: 44px 24px; text-align: center; }
+.uploader-inner { padding: 48px 24px; text-align: center; }
+
+.upload-glow {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+.upload-glow::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(123, 97, 255, 0.2), rgba(155, 135, 253, 0.08));
+  filter: blur(12px);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.uploader:hover .upload-glow::before,
+.uploader.is-dragover .upload-glow::before {
+  opacity: 1;
+}
 
 .upload-icon-wrap {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 64px; height: 64px;
-  background: var(--primary-bg);
-  border-radius: 16px;
-  margin-bottom: 16px;
+  background: linear-gradient(135deg, rgba(123, 97, 255, 0.1), rgba(155, 135, 253, 0.05));
+  border-radius: var(--radius);
+  transition: all var(--transition);
 }
+.uploader:hover .upload-icon-wrap,
+.uploader.is-dragover .upload-icon-wrap {
+  background: linear-gradient(135deg, rgba(123, 97, 255, 0.15), rgba(155, 135, 253, 0.1));
+  transform: scale(1.05);
+}
+
 .upload-icon { color: var(--primary); }
 
-.upload-text { font-size: 15px; color: var(--text-primary); margin-bottom: 8px; }
+.upload-text { font-size: 15px; color: var(--text-primary); margin-bottom: 8px; font-weight: 500; }
 .upload-text span { color: var(--primary); font-weight: 600; }
 
 .upload-hint { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 8px; }
 .upload-hint kbd {
   display: inline-block;
-  padding: 1px 6px;
+  padding: 2px 7px;
   font-size: 11px;
   font-family: inherit;
   color: var(--text-secondary);
-  background: var(--content-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
+  background: var(--glass-bg);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
 }
 
 .preview-area {
   position: relative;
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   overflow: hidden;
 }
 .preview-area img {
@@ -154,31 +192,44 @@ function clearFile() {
   width: 100%;
   max-height: 320px;
   object-fit: contain;
-  background: #f1f5f9;
+  background: rgba(123, 97, 255, 0.04);
 }
 .preview-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(26, 21, 40, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   color: #fff;
   font-size: 14px;
+  font-weight: 500;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity var(--transition);
 }
 .preview-area:hover .preview-overlay { opacity: 1; }
 
+.overlay-icon {
+  width: 44px; height: 44px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .clear-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 28px; height: 28px;
+  top: 12px; right: 12px;
+  width: 30px; height: 30px;
   border: none;
-  background: rgba(0,0,0,0.5);
+  background: rgba(26, 21, 40, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: #fff;
   border-radius: 50%;
   display: flex;
@@ -186,7 +237,10 @@ function clearFile() {
   justify-content: center;
   cursor: pointer;
   z-index: 2;
-  transition: background 0.2s;
+  transition: all var(--transition-fast);
 }
-.clear-btn:hover { background: #e74c3c; }
+.clear-btn:hover {
+  background: #E74C3C;
+  transform: scale(1.1);
+}
 </style>
